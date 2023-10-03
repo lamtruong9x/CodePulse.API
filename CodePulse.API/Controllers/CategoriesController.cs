@@ -20,12 +20,13 @@ namespace CodePulse.API.Controllers
             this.categoryRepository = categoryRepository;
         }
 
+        // GET: /api/categories
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var categories = await categoryRepository.GetAllAsync();
             var categoryDtos = new List<CategoryDto>();
-            foreach(var category in categories)
+            foreach (var category in categories)
             {
                 var categoryDto = new CategoryDto()
                 {
@@ -40,16 +41,16 @@ namespace CodePulse.API.Controllers
             return Ok(categoryDtos);
         }
 
-       [HttpPost]
-       public async Task<IActionResult> Create([FromBody] CreateCategoryRequestDto request)
-       {
-       // Map dto to domain
+        // POST: /api/categories
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateCategoryRequestDto request)
+        {
+            // Map dto to domain
             var category = new Category()
             {
                 Name = request.Name,
                 UrlHandle = request.UrlHandle
             };
-           
 
             category = await categoryRepository.CreateAsync(category);
 
@@ -61,7 +62,50 @@ namespace CodePulse.API.Controllers
             };
 
             return Ok(categoryDto);
-       } 
-      
+        }
+        // GET: /api/categories/{id}
+        [HttpGet]
+        [Route("{id:Guid}")]
+        public async Task<IActionResult> GetCategoryById([FromRoute] Guid id)
+        {
+            var category = await categoryRepository.GetAsync(id);
+            if (category is null)
+            {
+                return NotFound();
+            }
+
+            return Ok(new CategoryDto
+            {
+                Id = category.Id,
+                Name = category.Name,
+                UrlHandle = category.UrlHandle
+            });
+        }
+
+        // PUT: /api/categories/{id}
+        [HttpPut]
+        [Route("{id:Guid}")]
+        public async Task<IActionResult> UpdateCategory([FromRoute] Guid id, [FromBody] UpdateCategoryRequestDto request)
+        {
+            var category = new Category
+            {
+                Id = id,
+                Name = request.Name,
+                UrlHandle = request.UrlHandle
+            };
+
+            category = await categoryRepository.UpdateAysnc(category);
+            if (category is null)
+            {
+                return NotFound();
+            }
+
+            return Ok(new CategoryDto
+            {
+                Id = category.Id,
+                Name = category.Name,
+                UrlHandle = category.UrlHandle
+            });
+        }
     }
 }

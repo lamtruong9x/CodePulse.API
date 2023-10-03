@@ -2,6 +2,7 @@
 using CodePulse.API.Models.Domain;
 using CodePulse.API.Repositories.Interface;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace CodePulse.API.Repositories.Implementation
 {
@@ -22,6 +23,24 @@ namespace CodePulse.API.Repositories.Implementation
         public async Task<IEnumerable<Category>> GetAllAsync()
         {
             return await _dbContext.Categories.ToListAsync();
+        }
+
+        public async Task<Category?> GetAsync(Guid id)
+        {
+            return await _dbContext.Categories.FindAsync(id);
+        }
+
+        public async Task<Category?> UpdateAysnc(Category category)
+        {
+            var existingCategory = await _dbContext.Categories.FirstOrDefaultAsync(x => x.Id == category.Id);
+            if (existingCategory != null)
+            {
+                _dbContext.Entry(existingCategory).CurrentValues.SetValues(category);
+                await _dbContext.SaveChangesAsync();
+                return category;
+            }
+
+            return null;
         }
     }
 }
