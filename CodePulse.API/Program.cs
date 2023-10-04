@@ -1,4 +1,5 @@
 using CodePulse.API.Data;
+using CodePulse.API.Mappings;
 using CodePulse.API.Repositories.Implementation;
 using CodePulse.API.Repositories.Interface;
 using Microsoft.EntityFrameworkCore;
@@ -18,9 +19,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(option =>
     option.UseSqlServer(builder.Configuration.GetConnectionString("CodePulseConnectionString"));
 });
 
+// Add automapper
+builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));
+
 // Add repo
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-
+builder.Services.AddScoped<IBlogPostRepository, BlogPostRepository>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
